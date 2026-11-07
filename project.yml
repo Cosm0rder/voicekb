@@ -1,0 +1,53 @@
+name: VoiceKB
+options:
+  bundleIdPrefix: com.cosm0rder
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+targets:
+  VoiceKB:
+    type: application
+    platform: iOS
+    sources:
+      - Sources/App
+    info:
+      path: Sources/App/Info.plist
+      properties:
+        CFBundleDisplayName: ボイス入力
+        UILaunchScreen: {}
+        NSSpeechRecognitionUsageDescription: 音声を文字に変換するために使います。音声は端末内で処理されます。
+        NSMicrophoneUsageDescription: 音声入力のためにマイクを使います。
+        CFBundleURLTypes:
+          - CFBundleURLName: com.cosm0rder.voicekb
+            CFBundleURLSchemes:
+              - voicekb
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.cosm0rder.voicekb
+        TARGETED_DEVICE_FAMILY: "1"
+        SWIFT_VERSION: "5.0"
+    dependencies:
+      - target: VoiceKBKeyboard
+        embed: true
+  VoiceKBKeyboard:
+    type: app-extension
+    platform: iOS
+    sources:
+      - Sources/Keyboard
+    info:
+      path: Sources/Keyboard/Info.plist
+      properties:
+        CFBundleDisplayName: ボイス入力
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.keyboard-service
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).KeyboardViewController
+          NSExtensionAttributes:
+            IsASCIICapable: false
+            PrefersRightToLeft: false
+            PrimaryLanguage: ja-JP
+            RequestsOpenAccess: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.cosm0rder.voicekb.keyboard
+        TARGETED_DEVICE_FAMILY: "1"
+        SWIFT_VERSION: "5.0"

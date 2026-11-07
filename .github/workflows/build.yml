@@ -1,0 +1,29 @@
+name: build-ipa
+on:
+  push:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Generate project
+        run: xcodegen generate
+      - name: Build (unsigned)
+        run: |
+          xcodebuild -project VoiceKB.xcodeproj -scheme VoiceKB -sdk iphoneos \
+            -configuration Release -derivedDataPath build/DD \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            build
+      - name: Package unsigned IPA
+        run: |
+          mkdir -p Payload
+          cp -r "build/DD/Build/Products/Release-iphoneos/VoiceKB.app" Payload/
+          zip -qry VoiceKB-unsigned.ipa Payload
+          ls -la VoiceKB-unsigned.ipa
+      - uses: actions/upload-artifact@v4
+        with:
+          name: VoiceKB-ipa
+          path: VoiceKB-unsigned.ipa
